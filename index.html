@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#10102c">
+  <meta name="description" content="A family maze arcade with math adventures and playful preschool learning.">
+  <title>Pac·Learn — The family maze arcade</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath fill='%23ffe261' d='M36 10A19 19 0 1 0 36 30L20 20Z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/src/main.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Pac Learn home"><span class="pac-icon" aria-hidden="true"></span>Pac<span class="brand-dot">·</span>Learn</a>
+      <span class="header-note">A little learning. A lot of play.</span>
+      <button id="sound-toggle" class="quiet-button" aria-label="Turn sound off" aria-pressed="false"><span aria-hidden="true">♫</span> <span id="sound-text">Sound on</span></button>
+    </header>
+
+    <main id="setup-screen">
+      <div class="setup-layout">
+        <section class="arcade-intro" aria-label="Welcome to the family arcade">
+          <div class="intro-copy"><span class="welcome-line"><i></i> Your family arcade</span><h1>Small bites.<br>Big adventures.</h1><p>A classic maze. A curious mind.<br>Ready to chase a little knowledge?</p></div>
+          <div class="preview-board"><canvas id="preview" width="504" height="552" aria-label="Preview of a classic blue maze with pellets and colorful ghosts"></canvas><span class="preview-sticker">Play. Think. Power up.</span></div>
+          <div class="ghost-parade" aria-hidden="true"><span class="mini-ghost pink"></span><span class="mini-ghost cyan"></span><span class="mini-ghost peach"></span><span class="dot-trail">· · ·</span><span class="pac-icon"></span></div>
+        </section>
+
+        <section class="setup-panel" aria-labelledby="setup-title">
+          <div class="panel-heading"><span class="little-star" aria-hidden="true">✦</span><h2 id="setup-title">Who’s playing?</h2><p>Pick an adventure made for you.</p></div>
+          <div class="age-options" role="group" aria-label="Learning mode">
+            <button class="age-card selected" data-age="7" aria-pressed="true" aria-label="Math explorer Ages 7+"><span class="age-badge math-badge" aria-hidden="true">7<span>+</span></span><span><strong>Math explorer</strong><small>Ages 7+</small></span><span class="selection-dot" aria-hidden="true"></span></button>
+            <button class="age-card" data-age="3" aria-pressed="false" aria-label="Little explorer Ages 3+"><span class="age-badge little-badge" aria-hidden="true">3<span>+</span></span><span><strong>Little explorer</strong><small>Ages 3+</small></span><span class="selection-dot" aria-hidden="true"></span></button>
+          </div>
+
+          <div id="math-settings">
+            <fieldset><legend>What shall we practice?</legend><div class="operation-grid">
+              <button data-operation="addition" class="option-button selected" aria-pressed="true" aria-label="Addition"><b aria-hidden="true">+</b><span>Addition</span></button>
+              <button data-operation="subtraction" class="option-button" aria-pressed="false" aria-label="Subtraction"><b aria-hidden="true">−</b><span>Subtraction</span></button>
+              <button data-operation="multiplication" class="option-button" aria-pressed="false" aria-label="Multiplication"><b aria-hidden="true">×</b><span>Multiplication</span></button>
+              <button data-operation="division" class="option-button" aria-pressed="false" aria-label="Division"><b aria-hidden="true">÷</b><span>Division</span></button>
+            </div></fieldset>
+            <fieldset><legend>Choose your challenge</legend><div class="difficulty-options">
+              <button data-difficulty="easy" class="selected" aria-pressed="true">Easy</button><button data-difficulty="medium" aria-pressed="false">Medium</button><button data-difficulty="hard" aria-pressed="false">Hard</button>
+            </div><p class="field-note" id="difficulty-note">Little numbers. A lovely place to start.</p></fieldset>
+          </div>
+          <fieldset id="little-settings" hidden><legend>What shall we explore?</legend><div class="category-options">
+            <button data-category="mixed" class="selected" aria-pressed="true">✦ A little of everything</button><button data-category="counting" aria-pressed="false">Counting objects</button><button data-category="numbers" aria-pressed="false">Number names</button><button data-category="shapes" aria-pressed="false">Shapes & colors</button><button data-category="patterns" aria-pressed="false">Repeating patterns</button>
+          </div><p class="field-note">Big pictures, spoken questions, and time to think.</p></fieldset>
+
+          <div class="power-tip"><span class="power-orb" aria-hidden="true"></span><div><strong>A power pellet, a brain boost!</strong><p id="rules-note">Answer to chase blue ghosts. Get 10 right in a row for an extra life.</p></div></div>
+          <button id="start-button" class="primary-button">Let’s play <span aria-hidden="true">▶</span></button>
+          <p class="start-note"><span aria-hidden="true">♥</span> 5 lives to begin · A new maze every level</p>
+        </section>
+      </div>
+      <footer class="setup-footer"><span><span class="key-caps" aria-hidden="true">← ↑ ↓ →</span> Arrow keys on Mac</span><span><span aria-hidden="true">⊕</span> Joystick on iPhone & iPad</span><span>Made for little minds, at their own pace.</span></footer>
+    </main>
+
+    <main id="game-screen" hidden>
+      <div class="game-heading"><div><h1 id="map-name">The first bite</h1><p id="mode-label">Math explorer · Addition · Easy</p></div><button id="pause-button" class="quiet-button" aria-label="Pause game">Ⅱ <span>Pause</span></button></div>
+      <div class="hud" aria-label="Game stats"><div><small>Score</small><strong id="score">0</strong></div><div><small>Level</small><strong id="level">01</strong></div><div class="lives-stat"><small>Lives</small><strong id="lives" aria-label="5 lives">♥ ♥ ♥ ♥ ♥</strong></div><div><small>Next life</small><strong id="streak">0 / 10</strong></div></div>
+      <div class="play-layout">
+        <div class="board-wrap"><canvas id="board" width="630" height="690" role="img" aria-label="Game maze. Use arrow keys or the joystick to move, collect pellets, and avoid ghosts."></canvas><div id="ready-overlay" class="ready-overlay" aria-live="polite"><strong>Ready?</strong><span id="countdown">3</span></div></div>
+        <aside class="play-controls" aria-label="Movement controls">
+          <div class="power-meter"><span class="mini-ghost blue" aria-hidden="true"></span><div><strong id="power-label">Find a power pellet</strong><span id="power-hint">Then it’s your turn to chase.</span></div><progress id="power-progress" max="12" value="0" aria-label="Blue ghost time remaining"></progress></div>
+          <div id="joystick" class="joystick" aria-label="Direction joystick. Drag to steer." role="group"><span class="joy-up" aria-hidden="true">▲</span><span class="joy-left" aria-hidden="true">◀</span><span class="joy-right" aria-hidden="true">▶</span><span class="joy-down" aria-hidden="true">▼</span><div id="joystick-knob" class="joystick-knob"></div></div>
+          <p class="control-note">Drag to steer<br><span>or use the arrow keys</span></p>
+          <p id="game-notice" class="game-notice" aria-live="polite">Ready, little explorer?</p>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <dialog id="game-dialog" aria-labelledby="dialog-title"><div class="dialog-body">
+    <div id="question-panel" hidden><span class="dialog-icon" aria-hidden="true">✦</span><p class="dialog-eyebrow">Power-up challenge</p><h2 id="dialog-title">What is the answer?</h2><button id="speak-button" class="quiet-button">♫ Hear it again</button><div id="question-expression" class="question-expression"></div><div id="question-visual" class="question-visual"></div><div id="answers" class="answers"></div><p id="feedback" class="feedback" aria-live="polite"></p><button id="continue-button" class="primary-button" hidden>Chase the ghosts <span aria-hidden="true">▶</span></button><p class="dialog-footnote">The maze is paused. Take your time.</p></div>
+    <div id="pause-panel" hidden><span class="dialog-icon" aria-hidden="true">Ⅱ</span><h2>Take a little break</h2><p>Your maze will be right here.</p><button id="resume-button" class="primary-button">Resume game</button><button class="text-button new-game-button">Choose a new game</button></div>
+    <div id="over-panel" hidden><span class="dialog-icon" aria-hidden="true">★</span><h2>What an adventure!</h2><p id="over-summary"></p><div class="final-score"><small>Your score</small><strong id="final-score">0</strong></div><button id="replay-button" class="primary-button">Play again</button><button class="text-button new-game-button">Choose a new game</button></div>
+  </div></dialog>
+</body>
+</html>

@@ -49,11 +49,11 @@ function preschool(settings,level,previous) {
     return {...base,key:`shapes:${correct}:${colorQuestion}`,prompt:`Can you find the ${correct}${colorQuestion?' shape':''}?`,answer:correct,choices:shuffle([correct,...choices]).map(v=>({id:v,label:v,visual:[object(colorQuestion?'circle':v,colorQuestion?v:color)]}))};
   }
   const pattern=level<=2?[0,1]:level<=4?[0,0,1]:[0,1,2];
-  const items=[object('circle','red'),object('square','blue'),object('triangle','yellow')];
+  const items=shuffle([object('circle','red'),object('square','blue'),object('triangle','yellow')]);
   const length=pattern.length*2;
   const visual=Array.from({length},(_,i)=>items[pattern[i%pattern.length]]);
   const answer=String(pattern[length%pattern.length]);
-  return {...base,key:`patterns:${pattern.join('')}`,prompt:'What comes next in the pattern?',visual,pattern:true,answer,choices:shuffle(items.map((item,i)=>({id:String(i),label:`${item.color} ${item.shape}`,visual:[item]})))};
+  return {...base,key:`patterns:${pattern.join('')}:${items.map(item=>item.shape).join('-')}`,prompt:'What comes next in the pattern?',visual,pattern:true,answer,choices:shuffle(items.map((item,i)=>({id:String(i),label:`${item.color} ${item.shape}`,visual:[item]})))};
 }
 export function createQuestion(settings,level=1,previousKey) {
   let result;

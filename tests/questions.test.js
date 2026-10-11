@@ -45,3 +45,7 @@ test('mixed preschool questions rotate all four categories',()=>{
   for(let i=0;i<4;i++) {const q=createQuestion({age:3,category:'mixed'},1,previous);categories.push(q.category);previous=q.key;}
   assert.equal(new Set(categories).size,4);
 });
+test('preschool patterns offer varied objects instead of repeating one question',()=>{
+  let previous;
+  for(let i=0;i<12;i++){const q=createQuestion({age:3,category:'patterns'},1,previous);assert.notEqual(q.key,previous);previous=q.key;}
+});

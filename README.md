@@ -20,7 +20,47 @@ Open [the local game](http://localhost:5173). Pick a learning mode and press **L
 3. Find the Mac’s local IP in System Settings → Wi-Fi → Details → TCP/IP.
 4. Open `http://YOUR-MAC-IP:5173` in Safari. Allow the local server through the Mac firewall if prompted.
 
-Drag the yellow joystick in the direction you want to go. Release it to keep traveling in that direction. Turns queue until the next open intersection. The local server must remain running; `localhost` on a phone refers to the phone, not the Mac. A hosted deployment is not included in this repository setup.
+Drag the yellow joystick in the direction you want to go. Release it to keep traveling in that direction. Turns queue until the next open intersection. The local server must remain running; `localhost` on a phone refers to the phone, not the Mac.
+
+## Deploy to a VPS with Docker Compose
+
+Requires Docker Engine and the Docker Compose plugin on the VPS. Clone the implementation branch (the game has not yet been merged into `main`):
+
+```sh
+git clone --branch codex/learning-pacman --single-branch https://github.com/Tpizz23/Pacman.git
+cd Pacman
+docker compose up -d --build
+docker compose ps
+```
+
+The repository is private, so use your normal GitHub authentication or deploy key when cloning. Alternatively, upload `compose.yaml`, `Dockerfile`, `.dockerignore`, `docker/`, `index.html`, `style.css`, and `src/` together to one directory on the VPS, then run the Compose command from that directory. No `npm install` or separate build step is needed.
+
+Open `http://YOUR-VPS-IP:8080` from your Mac, iPhone, or iPad. Port 8080 must be allowed by your VPS/provider firewall. By default, this serves the game to anyone who can reach that port.
+
+To choose another host port:
+
+```sh
+PACMAN_PORT=8090 docker compose up -d --build
+```
+
+For an existing reverse proxy running on the VPS host, bind the game to localhost and route your domain's HTTPS traffic to `http://127.0.0.1:8080`:
+
+```sh
+PACMAN_BIND_ADDRESS=127.0.0.1 docker compose up -d --build
+```
+
+Put `PACMAN_PORT=8090` and/or `PACMAN_BIND_ADDRESS=127.0.0.1` in a `.env` file beside `compose.yaml` to keep those settings between commands. A proxy running in another container should instead share a Docker network and connect to `pacman:8080`; its own localhost refers to the proxy container. TLS and any desired access control are handled by your reverse proxy.
+
+To update, inspect logs, or stop the game:
+
+```sh
+git pull --ff-only
+docker compose up -d --build --pull always
+docker compose logs --tail=100 pacman
+docker compose down
+```
+
+The container uses the official Nginx Alpine image, runs as an unprivileged user with a read-only filesystem, and includes a health check and restart policy. It needs no database, persistent volumes, or secrets. Player preferences remain in each device's browser.
 
 ## Learning modes
 

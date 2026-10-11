@@ -1,0 +1,9 @@
+# Only ship the static game and its web-server configuration.
+**
+!Dockerfile
+!index.html
+!style.css
+!src/
+!src/**
+!docker/
+!docker/nginx.conf

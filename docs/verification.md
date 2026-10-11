@@ -30,3 +30,7 @@ No physical iPhone/iPad was available for verification. Device-specific speech o
 ## Correct-answer automatic resume
 
 Correct answers now immediately close the question and resume play with the full 12-second bonus, in both age modes and after preschool retries. Incorrect math answers retain the correction and Continue action. Added browser regression coverage for automatic resumption and a running bonus timer; all 22 model tests, 24 browser scenarios, and the static build pass.
+
+## Docker Compose deployment
+
+Added `compose.yaml`, a static Nginx `Dockerfile`, an allowlisted `.dockerignore`, and a non-root Nginx configuration. Validated with `docker compose config --quiet`, built and started an isolated `pacman-smoke` Compose project, and confirmed Docker's health check reports healthy. `nginx -t` succeeds and the server runs as the nginx user. HTTP checks confirm HTML, CSS, and ES modules are served with correct content types and revalidation headers; repository metadata, README, and missing assets are not served. Smoke-test resources were removed after verification. Tested on Docker Desktop Linux/ARM64; the uploaded source builds natively for the VPS architecture using the official multi-architecture Nginx image.

@@ -68,7 +68,15 @@ function buildQuestion() {
     if(choice.visual){button.classList.add('has-visual');const group=document.createElement('span');group.className='answer-visual';group.append(...choice.visual.map(shapeElement));button.append(group);}
     const caption=document.createElement('span');caption.textContent=choice.label;button.append(caption);
     if(r&&!r.retry){button.disabled=true;button.classList.toggle('correct',choice.id===q.answer);button.classList.toggle('incorrect',choice.id===r.id&&!r.correct);}
-    button.addEventListener('click',()=>{audio.unlock();game.answer(choice.id);sync();});answers.append(button);
+    button.addEventListener('click',()=>{
+      audio.unlock();game.answer(choice.id);
+      if(game.result?.correct) {
+        const extraLife=game.result.extraLife;
+        audio.cancelSpeech();game.continue();lastTime=performance.now();
+        if(game.phase==='playing')game.notice=`${extraLife?'An extra life! ':''}Great thinking! Chase the blue ghosts!`;
+      }
+      sync();
+    });answers.append(button);
   }
   $('continue-button').hidden=!r||r.retry;
   text('feedback',!r?'':r.retry?'Try again. You can do it!':r.correct?`${r.extraLife?'An extra life! ':''}Great thinking! 12 seconds to chase.`:`The answer is ${q.answer}. You have 5 seconds to chase.`);

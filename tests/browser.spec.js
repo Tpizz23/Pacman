@@ -39,8 +39,19 @@ test('preschool wrong answers retry; corrected answer resumes with bonus',async(
   const wrong=await page.evaluate(async()=>{const {game}=await import('/src/main.js');return game.question.choices.find(c=>c.id!==game.question.answer).id;});
   await page.locator(`#answers [data-answer="${wrong}"]`).click();await expect(page.locator('#feedback')).toContainText('Try again');
   const right=await page.evaluate(async()=>{const {game}=await import('/src/main.js');return game.question.answer;});
-  await page.locator(`#answers [data-answer="${right}"]`).click();await expect(page.locator('#feedback')).toContainText('12 seconds');
-  await page.getByRole('button',{name:'Chase the ghosts'}).click();await expect(page.getByRole('dialog')).not.toBeVisible();
+  await page.locator(`#answers [data-answer="${right}"]`).click();
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  await expect(page.locator('#power-label')).toContainText('12s');
+});
+test('a correct math answer immediately resumes play with bonus time',async({page})=>{
+  await start(page);await power(page);
+  const right=await page.evaluate(async()=>{const {game}=await import('/src/main.js');return game.question.answer;});
+  await page.locator(`#answers [data-answer="${right}"]`).click();
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  await expect(page.locator('#power-label')).toContainText('12s');
+  const before=await page.evaluate(async()=>{const {game}=await import('/src/main.js');return game.frightened;});
+  await page.waitForTimeout(250);
+  expect(await page.evaluate(async()=>{const {game}=await import('/src/main.js');return game.frightened;})).toBeLessThan(before);
 });
 test('corrupt or null saved preferences cannot prevent starting a game',async({page})=>{
   await page.addInitScript(()=>localStorage.setItem('pac-learn-preferences','null'));
@@ -48,12 +59,12 @@ test('corrupt or null saved preferences cannot prevent starting a game',async({p
 });
 test('losing focus pauses an answered question and preserves its feedback',async({page})=>{
   await start(page);await power(page);
-  const right=await page.evaluate(async()=>{const {game}=await import('/src/main.js');return game.question.answer;});
-  await page.locator(`#answers [data-answer="${right}"]`).click();
+  const wrong=await page.evaluate(async()=>{const {game}=await import('/src/main.js');return game.question.choices.find(c=>c.id!==game.question.answer).id;});
+  await page.locator(`#answers [data-answer="${wrong}"]`).click();
   await page.evaluate(()=>window.dispatchEvent(new Event('blur')));
   await expect(page.getByRole('heading',{name:'Take a little break'})).toBeVisible();
   await page.getByRole('button',{name:'Resume game'}).click();
-  await expect(page.locator('#feedback')).toContainText('12 seconds');
+  await expect(page.locator('#feedback')).toContainText('5 seconds');
   await page.getByRole('button',{name:'Chase the ghosts'}).click();
   await page.keyboard.press('p');await expect(page.getByRole('heading',{name:'Take a little break'})).toBeVisible();
 });

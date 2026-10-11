@@ -15,7 +15,9 @@ October 11, 2026
 
 Model suite: `npm test`. Browser suite: `npm run test:browser` with Chromium and WebKit. Static packaging: `npm run build`.
 
-The initial 21 model tests and 14 browser scenarios passed. Follow-up regression checks add null-preference recovery, preschool pattern variation, and answered-question interruption handling. Final counts and review findings will be recorded after the complete final run.
+Final result: **22 model tests passed, 22 browser scenarios passed (11 each in Chromium and WebKit), and the static build succeeded.** Follow-up checks cover null-preference recovery, preschool pattern variation, answered-question interruption handling, emulated touchscreen events, pointer cancellation, and a second pointer releasing while the first pointer continues steering.
+
+An independent whole-implementation review found two issues: corrected preschool answers did not receive their 100-point bonus, and non-owning pointer releases interrupted joystick steering. Both were reproduced with failing regression tests, fixed, and included in the final green suites. Corrected answers now earn points while retaining zero first-attempt streak credit. Joystick release handlers now check pointer ownership.
 
 Visual inspection: desktop setup at 1200px and active game at 390 × 844. Browser console had zero errors or warnings in the inspected session. Browser scenarios also check 375 × 667, 768 × 1024, and 844 × 390 for horizontal overflow and usable answers/joystick.
 

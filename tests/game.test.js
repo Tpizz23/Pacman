@@ -23,7 +23,8 @@ test('preschool retries cannot earn first-attempt streak credit',()=>{
   question(g);g.answer(g.question.answer);g.continue();assert.equal(g.streak,1);
   question(g);g.answer(g.question.choices.find(c=>c.id!==g.question.answer).id);
   assert.equal(g.phase,'question');assert.equal(g.result.retry,true);assert.equal(g.streak,0);
-  g.answer(g.question.answer);g.continue();assert.equal(g.streak,0);assert.equal(g.frightened,12);
+  const scoreBeforeCorrection=g.score;g.answer(g.question.answer);assert.equal(g.score,scoreBeforeCorrection+100);
+  g.continue();assert.equal(g.streak,0);assert.equal(g.frightened,12);
   for(let i=0;i<3;i++){question(g);g.answer(g.question.answer);g.continue();}
   assert.equal(g.lives,6);
 });

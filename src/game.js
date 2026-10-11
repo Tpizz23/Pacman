@@ -90,8 +90,9 @@ export class Game {
     if(!correct){this.streak=0;this.failed=true;this.events.push('wrong');}
     if(this.settings.age===3&&!correct){this.result={correct:false,retry:true,id};return;}
     let extraLife=false;
+    if(correct)this.score+=100;
     if(correct&&!this.failed) {
-      this.stats.correct++;this.score+=100;this.streak++;
+      this.stats.correct++;this.streak++;
       if(this.streak>=this.goal){this.streak=0;this.lives++;extraLife=true;this.events.push('life');}
     }
     this.result={correct,retry:false,id,extraLife,seconds:correct?12:5};

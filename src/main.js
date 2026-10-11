@@ -50,7 +50,7 @@ function steer(event){const r=joystick.getBoundingClientRect(),dx=event.clientX-
 function resetJoystick(){if(activePointer!==null){try{joystick.releasePointerCapture(activePointer);}catch{}}activePointer=null;$('joystick-knob').style.transform='';}
 joystick.addEventListener('pointerdown',event=>{if(activePointer!==null)return;activePointer=event.pointerId;joystick.setPointerCapture(event.pointerId);steer(event);});
 joystick.addEventListener('pointermove',event=>{if(event.pointerId===activePointer)steer(event);});
-for(const event of ['pointerup','pointercancel','lostpointercapture'])joystick.addEventListener(event,resetJoystick);
+for(const event of ['pointerup','pointercancel','lostpointercapture'])joystick.addEventListener(event,e=>{if(e.pointerId===activePointer)resetJoystick();});
 const colorMap={red:'#ff748a',blue:'#8099ff',yellow:'#ffe261',green:'#8ce2af'};
 function shapeElement(item){const span=document.createElement('span');span.className=`shape ${item.shape}`;span.style.setProperty('--object-color',colorMap[item.color]);span.setAttribute('aria-hidden','true');return span;}
 function buildQuestion() {

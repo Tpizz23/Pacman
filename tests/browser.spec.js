@@ -19,6 +19,7 @@ test('select arithmetic and difficulty, move with keys, pause and resume',async(
   await page.waitForTimeout(3300);
   const before=await page.evaluate(async()=>{const {game}=await import('/src/main.js');return game.score;});
   await page.keyboard.press('ArrowLeft');await page.waitForTimeout(600);
+  expect(await page.evaluate(async()=>{const {game}=await import('/src/main.js');return game.wanted;})).toBe('left');
   const after=await page.evaluate(async()=>{const {game}=await import('/src/main.js');return game.score;});
   expect(after).toBeGreaterThan(before);
   await page.getByRole('button',{name:'Pause game'}).click();await expect(page.getByRole('heading',{name:'Take a little break'})).toBeVisible();
@@ -55,6 +56,33 @@ test('losing focus pauses an answered question and preserves its feedback',async
   await expect(page.locator('#feedback')).toContainText('12 seconds');
   await page.getByRole('button',{name:'Chase the ghosts'}).click();
   await page.keyboard.press('p');await expect(page.getByRole('heading',{name:'Take a little break'})).toBeVisible();
+});
+test('touchscreen steering and cancellation reset the joystick',async({browser})=>{
+  const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true});
+  const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+  try {
+    await start(page,3);const stick=page.locator('#joystick'),b=await stick.boundingBox();
+    await page.touchscreen.tap(b.x+b.width*.85,b.y+b.height/2);
+    expect(await page.evaluate(async()=>{const {game}=await import('/src/main.js');return game.wanted;})).toBe('right');
+    await expect(page.locator('#joystick-knob')).toHaveCSS('transform','none');
+    await page.mouse.move(b.x+b.width/2,b.y+b.height/2);await page.mouse.down();
+    await page.mouse.move(b.x+b.width/2,b.y+10);
+    await stick.dispatchEvent('pointercancel',{pointerId:1,pointerType:'mouse'});
+    await expect(page.locator('#joystick-knob')).toHaveCSS('transform','none');
+    await page.mouse.up();expect(errors).toEqual([]);
+  }finally{await context.close();}
+});
+test('a second finger release does not interrupt the steering pointer',async({page})=>{
+  await page.setViewportSize({width:390,height:844});await start(page);
+  const stick=page.locator('#joystick'),b=await stick.boundingBox();
+  await page.mouse.move(b.x+b.width/2,b.y+b.height/2);await page.mouse.down();await page.mouse.move(b.x+b.width*.85,b.y+b.height/2);
+  await expect(page.locator('#joystick-knob')).not.toHaveCSS('transform','none');
+  await stick.dispatchEvent('pointerdown',{pointerId:99,pointerType:'touch',clientX:b.x+20,clientY:b.y+20});
+  await stick.dispatchEvent('pointerup',{pointerId:99,pointerType:'touch'});
+  await expect(page.locator('#joystick-knob')).not.toHaveCSS('transform','none');
+  await page.mouse.move(b.x+b.width/2,b.y+10);
+  expect(await page.evaluate(async()=>{const {game}=await import('/src/main.js');return game.wanted;})).toBe('up');
+  await page.mouse.up();await expect(page.locator('#joystick-knob')).toHaveCSS('transform','none');
 });
 for(const size of [{width:390,height:844},{width:375,height:667},{width:768,height:1024},{width:844,height:390}]) {
   test(`touch layout ${size.width}x${size.height} has usable controls without overflow`,async({page})=>{
